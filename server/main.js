@@ -17,7 +17,7 @@ const io = new Server(server, {
 app.use(cors());
 app.use(express.json());
 
-mongoose.connect("mongodb+srv://dbBags:pfPSKr6c5oimEdti@bags.xtnbpp7.mongodb.net/codeblocks?retryWrites=true&w=majority")
+mongoose.connect(process.env.DATA_BASE)
     .then(() => console.log('MongoDB connected'))
     .catch(err => console.log(err));
 
