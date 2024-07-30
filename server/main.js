@@ -9,7 +9,7 @@ const app = express();
 const server = http.createServer(app);
 const io = new Server(server, {
     cors: {
-        origin: "https://socket-io-mini-project-client.onrender.com",
+        origin: process.env.CLIENT_URL,
         methods: ['GET', 'POST']
     }
 });
