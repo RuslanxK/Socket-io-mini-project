@@ -17,7 +17,7 @@ const CodeBlock = () => {
     const [isCorrect, setIsCorrect] = useState(false);
 
     useEffect(() => {
-        axios.get(`https://socket-io-mini-project-server.onrender.com/codeblocks/${id}`)
+        axios.get(`${process.env.SERVER_URL}/codeblocks/${id}`)
             .then(response => {
                 setCode(response.data.code);
                 setSolution(response.data.solution);
@@ -47,7 +47,7 @@ const CodeBlock = () => {
         socket.emit('codeChange', { id, code: newCode });
 
         // Optionally, save to DB immediately if needed
-        axios.put(`https://socket-io-mini-project-server.onrender.com/${id}`, { code: newCode })
+        axios.put(`${process.env.SERVER_URL}/${id}`, { code: newCode })
             .then(response => console.log('Code updated in DB:', response.data))
             .catch(error => console.error('Error updating code in DB:', error));
 

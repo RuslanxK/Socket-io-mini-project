@@ -9,7 +9,7 @@ const Lobby = () => {
 
     useEffect(() => {
         // Fetch the code blocks from the server
-        axios.get('https://socket-io-mini-project-server.onrender.com/codeblocks')
+        axios.get(`${process.env.SERVER_URL}/codeblocks`)
             .then(response => setBlocks(response.data))
             .catch(error => console.error('Error fetching code blocks:', error));
     }, []);
