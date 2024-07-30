@@ -5,7 +5,7 @@ import io from 'socket.io-client';
 import hljs from 'highlight.js';
 import 'highlight.js/styles/default.css';
 
-const socket = io('https://socket-io-mini-project-server.onrender.com');
+const socket = io(process.env.REACT_APP_SERVER_URL);
 
 const CodeBlock = () => {
     const { id } = useParams();
