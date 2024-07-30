@@ -50,6 +50,27 @@ app.get('/codeblocks/:id', async (req, res) => {
     }
 });
 
+app.post('/codeblocks', async (req, res) => {
+    const { title, code, solution } = req.body;
+    if (!title || !code || !solution) {
+        return res.status(400).json({ message: 'All fields are required' });
+    }
+
+    const newCodeBlock = new CodeBlock({
+        title,
+        code,
+        solution
+    });
+
+    try {
+        const savedBlock = await newCodeBlock.save();
+        res.status(201).json(savedBlock);
+    } catch (error) {
+        res.status(500).json({ message: error.message });
+    }
+});
+
+
 app.put('/codeblocks/:id', async (req, res) => {
     try {
         const updatedBlock = await CodeBlock.findByIdAndUpdate(req.params.id, req.body, { new: true });
