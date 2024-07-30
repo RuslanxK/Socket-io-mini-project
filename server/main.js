@@ -9,7 +9,7 @@ const app = express();
 const server = http.createServer(app);
 const io = new Server(server, {
     cors: {
-        origin: process.env.CLIENT_URL,
+        origin: "https://socket-io-mini-project-client.onrender.com",
         methods: ['GET', 'POST']
     }
 });
@@ -17,7 +17,7 @@ const io = new Server(server, {
 app.use(cors());
 app.use(express.json());
 
-mongoose.connect(process.env.DATA_BASE)
+mongoose.connect("mongodb+srv://dbBags:pfPSKr6c5oimEdti@bags.xtnbpp7.mongodb.net/codeblocks?retryWrites=true&w=majority")
     .then(() => console.log('MongoDB connected'))
     .catch(err => console.log(err));
 

@@ -6,7 +6,7 @@ import hljs from 'highlight.js';
 import 'highlight.js/styles/default.css';
 
 
-const socket = io(process.env.SERVER_URL);
+const socket = io("https://socket-io-mini-project-server.onrender.com");
 
 const CodeBlock = () => {
     const { id } = useParams();
@@ -18,7 +18,7 @@ const CodeBlock = () => {
 
     useEffect(() => {
         
-        axios.get(`${process.env.SERVER_URL}/codeblocks/${id}`)
+        axios.get(`https://socket-io-mini-project-server.onrender.com/codeblocks/${id}`)
             .then(response => {
                 setCode(response.data.code);
                 setSolution(response.data.solution);
@@ -66,7 +66,7 @@ const CodeBlock = () => {
         socket.emit('codeChange', { id, code: newCode });
 
         // Optionally, save to DB immediately if needed
-        axios.put(`${process.env.SERVER_URL}/${id}`, { code: newCode })
+        axios.put(`https://socket-io-mini-project-server.onrender.com/${id}`, { code: newCode })
             .then(response => {
                 console.log('Code updated in DB:', response.data);
             })
