@@ -5,13 +5,22 @@ import axios from 'axios';
 const Lobby = () => {
     const navigate = useNavigate();
     const [blocks, setBlocks] = useState([]);
+    const [isMentor, setIsMentor] = useState(null);
 
     useEffect(() => {
         // Fetch the code blocks from the server
-        axios.get(`https://socket-io-mini-project-server.onrender.com/codeblocks`)
+        axios.get('https://socket-io-mini-project-server.onrender.com/codeblocks')
             .then(response => setBlocks(response.data))
             .catch(error => console.error('Error fetching code blocks:', error));
     }, []);
+
+    const handleSelectBlock = (blockId) => {
+        // Randomly assign roles (or implement your own logic)
+        const role = Math.random() < 0.5 ? 'mentor' : 'student';
+        setIsMentor(role === 'mentor');
+        // Navigate to the code block page with the assigned role
+        navigate(`/codeblock/${blockId}`, { state: { isMentor: role === 'mentor' } });
+    };
 
     return (
         <div>
@@ -20,7 +29,7 @@ const Lobby = () => {
                 {blocks.length > 0 ? (
                     blocks.map(block => (
                         <li key={block._id}>
-                            <button onClick={() => navigate(`/codeblock/${block._id}`)}>
+                            <button onClick={() => handleSelectBlock(block._id)}>
                                 {block.title}
                             </button>
                         </li>

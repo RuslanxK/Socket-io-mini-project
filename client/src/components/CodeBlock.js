@@ -1,84 +1,58 @@
 import React, { useEffect, useState } from 'react';
-import { useParams } from 'react-router-dom';
+import { useParams, useLocation } from 'react-router-dom';
 import axios from 'axios';
 import io from 'socket.io-client';
 import hljs from 'highlight.js';
 import 'highlight.js/styles/default.css';
 
-
-const socket = io("https://socket-io-mini-project-server.onrender.com");
+const socket = io('https://socket-io-mini-project-server.onrender.com');
 
 const CodeBlock = () => {
     const { id } = useParams();
+    const { state } = useLocation();
+    const { isMentor } = state || {}; // Get the role from navigation state
     const [code, setCode] = useState('');
     const [solution, setSolution] = useState('');
     const [editorCode, setEditorCode] = useState('');
-    const [isMentor, setIsMentor] = useState(false);
     const [isCorrect, setIsCorrect] = useState(false);
 
     useEffect(() => {
-        
         axios.get(`https://socket-io-mini-project-server.onrender.com/codeblocks/${id}`)
             .then(response => {
                 setCode(response.data.code);
                 setSolution(response.data.solution);
                 setEditorCode(response.data.code);
-
             })
             .catch(error => console.error('Error fetching code block:', error));
-
-        // Listen for role assignment
-        socket.on('role', (role) => {
-            setIsMentor(role === 'mentor');
-            console.log('Role assigned:', role);
-        });
 
         // Listen for code updates from other users
         socket.on('codeUpdate', (data) => {
             console.log('Code update received:', data);
-         
-                setEditorCode(data.code);
-            
+            setEditorCode(data.code);
         });
 
         return () => {
-            socket.off('role');
             socket.off('codeUpdate');
         };
-    }, [id, isMentor]);
-
+    }, [id]);
 
     useEffect(() => {
         // Check if the editor code matches the solution
-        if (editorCode === solution) {
-            setIsCorrect(true);
-        } else {
-            setIsCorrect(false);
-        }
+        setIsCorrect(editorCode === solution);
     }, [editorCode, solution]);
 
-
-
     const handleChange = (e) => {
-
         const newCode = e.target.value;
         setEditorCode(newCode);
         socket.emit('codeChange', { id, code: newCode });
 
         // Optionally, save to DB immediately if needed
         axios.put(`https://socket-io-mini-project-server.onrender.com/${id}`, { code: newCode })
-            .then(response => {
-                console.log('Code updated in DB:', response.data);
-            })
+            .then(response => console.log('Code updated in DB:', response.data))
             .catch(error => console.error('Error updating code in DB:', error));
 
-            if (newCode === solution) {
-                setIsCorrect(true);
-            } else {
-                setIsCorrect(false);
-            }
+        setIsCorrect(newCode === solution);
     };
-
 
     const renderHighlightedCode = (code) => {
         return { __html: hljs.highlight(code, { language: 'javascript' }).value };
@@ -86,33 +60,31 @@ const CodeBlock = () => {
 
     return (
         <div>
-            <h1>Code Block - I'm {isMentor ? 'Tom the mentor' : "Student"}</h1>
+            <h1>Code Block - I'm {isMentor ? 'Tom the mentor' : 'the student'}</h1>
             <pre>
-                <code dangerouslySetInnerHTML={renderHighlightedCode(solution)}/>
+                <code dangerouslySetInnerHTML={renderHighlightedCode(solution)} />
             </pre>
-
-            <div style={{display: "flex", alignItems: "center"}}>
-            <textarea
-                value={editorCode}
-                onChange={handleChange}
-                readOnly={isMentor}
-                placeholder="Your solution goes here..."
-                style={{
-                    width: '50%',
-                    height: '400px',
-                    padding: '10px',
-                    backgroundColor: isCorrect ? '#d4edda' : null,
-                    caretColor: 'black',
-                  
-                   
-                }}
-            />
-
-               { isCorrect ? <div style={{  marginLeft: "200px"}}>
-                    <span style={{ fontSize: '60px'}}>Success</span>
-                      <span style={{ fontSize: '120px'}} >😊</span>
-                </div> : null }
-                </div>
+            <div style={{ display: 'flex', alignItems: 'center' }}>
+                <textarea
+                    value={editorCode}
+                    onChange={handleChange}
+                    readOnly={isMentor}
+                    placeholder="Your solution goes here..."
+                    style={{
+                        width: '50%',
+                        height: '400px',
+                        padding: '10px',
+                        backgroundColor: isCorrect ? '#d4edda' : null,
+                        caretColor: 'black',
+                    }}
+                />
+                {isCorrect && (
+                    <div style={{ marginLeft: '200px' }}>
+                        <span style={{ fontSize: '60px' }}>Success</span>
+                        <span style={{ fontSize: '120px' }}>😊</span>
+                    </div>
+                )}
+            </div>
         </div>
     );
 };
